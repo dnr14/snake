@@ -1,0 +1,45 @@
+#root {
+  position: relative;
+  display: flex;
+  width: 1000px;
+  margin: auto;
+}
+
+#right {
+  order: 2;
+  width: 100%;
+}
+
+#title {
+  font-family: "Tourney", cursive;
+  color: royalblue;
+  font-size: 2rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+#difficulty,
+#score,
+#count {
+  font-family: "Noto Sans", sans-serif;
+  padding-left: 30px;
+  font-size: 1.5rem;
+  margin-top: 10px;
+  font-weight: 900;
+}
+
+#gameover {
+  opacity: 0;
+  font-family: "Tourney", cursive;
+  color: red;
+  font-size: 4rem;
+  top: 30%;
+  left: 7%;
+  position: absolute;
+  transition: 0.5s;
+  text-align: center;
+}
+
+.number {
+  font-family: "Tourney", cursive;
+}

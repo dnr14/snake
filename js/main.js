@@ -2,17 +2,16 @@
   더 개발 해야될것들
   1. 시간에 따른 난이도 상승
   2. 원하는 난이도에서 시작
-  3. 점수 
   4. ul 개발
   5. n X n 선택 가능
   6. 변수 명 정리
   7. 코드 리팩토링
-  8. 자바스크립트 스레드 멈추기
+  시작 눌렀을때 시작
 */
 
 class App {
   constructor() {
-    this.BLOCKSIZE = 30;
+    this.CELLSIZE = 30;
     this.ROWS = 25;
     this.COLUMNS = 15;
 
@@ -23,33 +22,49 @@ class App {
       up: "ArrowUp"
     }
 
+
+    this.$socreEl = document.querySelector("#score > .number");
+    this.$countEl = document.querySelector("#count > .number");
+    this.$difficultyEl = document.querySelector("#difficulty >.number");
+    this.$gameoverEl = document.querySelector("#gameover");
     this.array = Array.from({ length: this.COLUMNS }, () => { return Array(this.ROWS).fill(0) });
     this.canvas = document.createElement("canvas");
     this.ctx = this.canvas.getContext("2d");
 
-    this.ctx.canvas.width = this.BLOCKSIZE * this.ROWS;
-    this.ctx.canvas.height = this.BLOCKSIZE * this.COLUMNS;
+    this.ctx.canvas.width = this.CELLSIZE * this.ROWS;
+    this.ctx.canvas.height = this.CELLSIZE * this.COLUMNS;
 
-    this.ctx.scale(this.BLOCKSIZE, this.BLOCKSIZE);
+    this.ctx.scale(this.CELLSIZE, this.CELLSIZE);
+
+    this.time = 300;
+    this.count = 0;
 
     this.SNAKE_ARRAY = [];
 
     this.currentDirection = "down";
-    let start = 3;
 
-    for (let i = start; i >= 0; i--) {
-      const snake = new Snake(i, 0);
-      this.SNAKE_ARRAY.push(snake);
+
+    this.difficultyObj = {
+      _3: false,
+      _5: false,
+      _10: false
     }
+
     this.setElement();
     this.init();
-
   }
 
   setElement() {
     document.querySelector("#root").appendChild(this.canvas);
+    this.ctx.fillStyle = "black";
+    this.ctx.fillRect(0, 0, this.ROWS, this.CELLSIZE);
   }
   init() {
+    let start = 3;
+    for (let i = start; i >= 0; i--) {
+      const snake = new Snake(i, 0);
+      this.SNAKE_ARRAY.push(snake);
+    }
     this.eventHandler();
     this.render();
     this.autoMaticMovement();
@@ -59,24 +74,19 @@ class App {
   eventHandler() {
     window.addEventListener('keydown', this.keyEv);
   }
+
   keyEv = (e) => {
-    let { state } = this.SNAKE_ARRAY[0];
-    let isGameOver = false;
     switch (e.key) {
       case this.key.down:
-        // isGameOver = this.downMove(state);
         this.currentDirection = "down";
         break;
       case this.key.left:
-        // isGameOver = this.leftMove(state);
         this.currentDirection = "left";
         break;
       case this.key.right:
-        // isGameOver = this.rightMove(state);
         this.currentDirection = "right";
         break;
       case this.key.up:
-        // isGameOver = this.upMove(state);
         this.currentDirection = "up";
         break;
     }
@@ -90,6 +100,10 @@ class App {
         return true;
       if (nextValue === 0)
         this.SNAKE_ARRAY.pop();
+      if (nextValue === 2) {
+        this.count++;
+        this.setScore();
+      }
 
       const deepCopy = JSON.parse(JSON.stringify(this.SNAKE_ARRAY[0]));
       deepCopy.state.x += 1;
@@ -101,7 +115,6 @@ class App {
     return false;
   }
 
-
   leftMove(state) {
     if ((state.x - 1) >= 0) {
       const nextValue = this.array[state.y][state.x - 1];
@@ -109,6 +122,10 @@ class App {
         return true;
       if (nextValue === 0)
         this.SNAKE_ARRAY.pop();
+      if (nextValue === 2) {
+        this.count++;
+        this.setScore();
+      }
 
       const deepCopy = JSON.parse(JSON.stringify(this.SNAKE_ARRAY[0]));
       deepCopy.state.x -= 1;
@@ -127,6 +144,10 @@ class App {
         return true;
       if (nextValue === 0)
         this.SNAKE_ARRAY.pop();
+      if (nextValue === 2) {
+        this.count++;
+        this.setScore();
+      }
 
       const deepCopy = JSON.parse(JSON.stringify(this.SNAKE_ARRAY[0]));
       deepCopy.state.y += 1;
@@ -145,6 +166,10 @@ class App {
         return true;
       if (nextValue === 0)
         this.SNAKE_ARRAY.pop();
+      if (nextValue === 2) {
+        this.count++;
+        this.setScore();
+      }
 
       const deepCopy = JSON.parse(JSON.stringify(this.SNAKE_ARRAY[0]));
       deepCopy.state.y -= 1;
@@ -158,19 +183,16 @@ class App {
 
   render() {
     this.renderAllRemove();
-    this.array.forEach((columns, iy) => {
-      columns.forEach((value, ix) => {
+
+    this.array.forEach((rows) => {
+      rows.forEach((value, idx) => {
         if (value !== 2) {
-          columns[ix] = 0;
+          rows[idx] = 0;
         }
       });
     });
 
-    this.SNAKE_ARRAY.forEach(snake => {
-      let { state } = snake;
-      this.array[state.y][state.x] = 1;
-    });
-
+    this.SNAKE_ARRAY.forEach(snake => this.array[snake.state.y][snake.state.x] = 1);
 
     this.array.forEach((columns, idx) => {
       columns.forEach((value, index) => {
@@ -179,7 +201,7 @@ class App {
           this.ctx.fillRect(index, idx, 0.95, 0.95);
         }
         if (value === 2) {
-          this.ctx.fillStyle = "green";
+          this.ctx.fillStyle = "red";
           this.ctx.fillRect(index, idx, 1, 1);
         }
       });
@@ -192,13 +214,13 @@ class App {
     this.ctx.fillRect(0, 0, this.ROWS, this.COLUMNS);
   }
 
-  gameOver() {
-    alert("게임오버");
-    window.removeEventListener('keydown', this.keyEv);
-  }
-
   autoMaticMovement() {
     this._autoMaticMovement = setInterval(() => {
+
+      if (this.difficultyObj._3 === false || this.difficultyObj._5 === false || this.difficultyObj._10 === false) {
+        this.setDifficult();
+      }
+
       let { state } = this.SNAKE_ARRAY[0];
       let isGameOver = false;
       switch (this.currentDirection) {
@@ -223,23 +245,41 @@ class App {
       } else {
         this.render();
       }
-    }, 100);
+    }, this.time);
   }
+
   autoMaticRender() {
     this._autoMaticRander = setInterval(() => {
       let x = Math.floor(Math.random() * this.COLUMNS);
       let y = Math.floor(Math.random() * this.ROWS);
       this.array[x][y] = 2;
-      console.log(this.array);
-      this.array.forEach((columns, idx) => {
-        columns.forEach((value, index) => {
-          if (value === 2) {
-            this.ctx.fillStyle = "green";
-            this.ctx.fillRect(index, idx, 1, 1);
-          }
-        });
-      })
     }, 3000);
+  }
+
+  setDifficult() {
+    if (this.count === 3 && this.difficultyObj._3 === false) {
+      this.$difficultyEl.textContent = `${3}`;
+      this.difficultyObj._3 = true;
+      this.time = 150;
+      clearInterval(this._autoMaticMovement);
+      this.autoMaticMovement();
+    }
+
+    if (this.count === 5 && this.difficultyObj._5 === false) {
+      this.$difficultyEl.textContent = `${5}`;
+      this.difficultyObj._5 = true;
+      this.time = 100;
+      clearInterval(this._autoMaticMovement);
+      this.autoMaticMovement();
+    }
+    if (this.count === 10 && this.difficultyObj._10 === false) {
+      this.$difficultyEl.textContent = `${10}`;
+      this.difficultyObj._10 = true;
+      this.time = 50;
+      clearInterval(this._autoMaticMovement);
+      this.autoMaticMovement();
+    }
+
   }
 
   getRandomColor = function (_isAlpha) {
@@ -260,16 +300,32 @@ class App {
     };
   };
 
+  setScore() {
+    let score = this.count * 50;
+    this.$socreEl.textContent = `${score}`;
+    this.$countEl.textContent = `${this.count}`;
+  }
+
+
+  gameOver() {
+    this.$gameoverEl.style.opacity = 1;
+    setInterval(() => {
+      this.$gameoverEl.style.opacity === "1"
+        ? this.$gameoverEl.style.opacity = 0
+        : this.$gameoverEl.style.opacity = 1;
+    }, 700);
+
+    window.removeEventListener('keydown', this.keyEv);
+  }
 }
 
-
 class Snake {
-  constructor(x, y, color) {
+  constructor(x, y) {
     this.state = {};
     this.state.x = x;
     this.state.y = y;
-    this.color = color;
   }
+
 }
 
 window.onload = () => {
