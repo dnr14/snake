@@ -1,14 +1,3 @@
-/*
-  더 개발 해야될것들
-  1. 시간에 따른 난이도 상승
-  2. 원하는 난이도에서 시작
-  4. ul 개발
-  5. n X n 선택 가능
-  6. 변수 명 정리
-  7. 코드 리팩토링
-  시작 눌렀을때 시작
-*/
-
 class App {
   constructor() {
     this.CELLSIZE = 30;
@@ -23,10 +12,15 @@ class App {
     }
 
 
+    // $가 붙은 변수는 El 요소를 표기
     this.$socreEl = document.querySelector("#score > .number");
     this.$countEl = document.querySelector("#count > .number");
     this.$difficultyEl = document.querySelector("#difficulty >.number");
+    this.$btn = document.querySelector('#start');
     this.$gameoverEl = document.querySelector("#gameover");
+    this.$difficultySelectedEl = document.querySelector("#difficultySelected");
+
+
     this.array = Array.from({ length: this.COLUMNS }, () => { return Array(this.ROWS).fill(0) });
     this.canvas = document.createElement("canvas");
     this.ctx = this.canvas.getContext("2d");
@@ -41,8 +35,9 @@ class App {
 
     this.SNAKE_ARRAY = [];
 
-    this.currentDirection = "down";
-
+    this.currentDirection = "right";
+    this.started = false;
+    this.difficulted = false;
 
     this.difficultyObj = {
       _3: false,
@@ -51,13 +46,41 @@ class App {
     }
 
     this.setElement();
-    this.init();
   }
+
+  start = () => {
+
+    if (!this.started) {
+
+      let idx = this.$difficultySelectedEl.selectedIndex;
+      let value = parseInt(this.$difficultySelectedEl.options[idx].value);
+
+      if (value !== 0) {
+        this.difficulted = true;
+        if (value === 5) {
+          this.time = 100;
+        } else if (value === 7) {
+          this.time = 80;
+        } else if (value === 9) {
+          this.time = 60;
+        } else {
+          this.time = 40;
+        }
+        this.$difficultyEl.textContent = value
+      }
+
+      this.init();
+      this.started = true;
+    }
+  }
+
 
   setElement() {
     document.querySelector("#root").appendChild(this.canvas);
+    this.$btn.addEventListener('click', this.start);
     this.ctx.fillStyle = "black";
-    this.ctx.fillRect(0, 0, this.ROWS, this.CELLSIZE);
+    this.ctx.fillRect(0, 0, this.ROWS, this.COLUMNS);
+
   }
   init() {
     let start = 3;
@@ -78,15 +101,27 @@ class App {
   keyEv = (e) => {
     switch (e.key) {
       case this.key.down:
+        if (this.currentDirection === "up" || this.currentDirection === "down")
+          return;
+
         this.currentDirection = "down";
         break;
       case this.key.left:
+        if (this.currentDirection === "right" || this.currentDirection === "left")
+          return;
+
         this.currentDirection = "left";
         break;
       case this.key.right:
+        if (this.currentDirection === "left" || this.currentDirection === "right")
+          return;
+
         this.currentDirection = "right";
         break;
       case this.key.up:
+        if (this.currentDirection === "down" || this.currentDirection === "up")
+          return;
+
         this.currentDirection = "up";
         break;
     }
@@ -138,6 +173,7 @@ class App {
   }
 
   downMove(state) {
+
     if ((state.y + 1) < this.COLUMNS) {
       const nextValue = this.array[state.y + 1][state.x];
       if (nextValue === 1)
@@ -201,7 +237,7 @@ class App {
           this.ctx.fillRect(index, idx, 0.95, 0.95);
         }
         if (value === 2) {
-          this.ctx.fillStyle = "red";
+          this.ctx.fillStyle = "#D18063";
           this.ctx.fillRect(index, idx, 1, 1);
         }
       });
@@ -217,7 +253,7 @@ class App {
   autoMaticMovement() {
     this._autoMaticMovement = setInterval(() => {
 
-      if (this.difficultyObj._3 === false || this.difficultyObj._5 === false || this.difficultyObj._10 === false) {
+      if (!this.difficulted && (this.difficultyObj._3 === false || this.difficultyObj._5 === false || this.difficultyObj._10 === false)) {
         this.setDifficult();
       }
 
@@ -329,5 +365,5 @@ class Snake {
 }
 
 window.onload = () => {
-  new App();
+  const app = new App();
 }

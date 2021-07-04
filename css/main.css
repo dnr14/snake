@@ -6,6 +6,7 @@
 }
 
 #right {
+  position: relative;
   order: 2;
   width: 100%;
 }
@@ -20,12 +21,23 @@
 
 #difficulty,
 #score,
-#count {
+#count,
+#select {
   font-family: "Noto Sans", sans-serif;
   padding-left: 30px;
   font-size: 1.5rem;
   margin-top: 10px;
   font-weight: 900;
+}
+
+#difficultySelected {
+  width: 100px;
+  height: 30px;
+  vertical-align: middle;
+  border-radius: 10px;
+  outline: none;
+  padding-left: 10px;
+  margin-bottom: 5px;
 }
 
 #gameover {
@@ -38,6 +50,28 @@
   position: absolute;
   transition: 0.5s;
   text-align: center;
+}
+
+#start {
+  font-family: "Noto Sans", sans-serif;
+  background-color: #f0e4d4;
+  border: none;
+  padding: 5px 15px;
+  position: absolute;
+  width: 80%;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: #000;
+  font-size: 1.5rem;
+  line-height: 3rem;
+  letter-spacing: 0.2rem;
+  margin: 0 auto;
+  border-radius: 10px;
+  font-weight: 900;
+}
+#start:active {
+  border: 2px solid #000;
 }
 
 .number {
