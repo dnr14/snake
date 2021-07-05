@@ -413,5 +413,6 @@ class Snake {
 }
 
 window.onload = () => {
+  //속도가 느릴때 아래 왼쪽 빠르게 방향 키 눌럿을때 setInteval 쪽에서 버그 방향 그래서 gameover
   new App();
 }
