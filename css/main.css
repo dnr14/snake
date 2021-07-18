@@ -1,8 +1,13 @@
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
 #root {
   position: relative;
   display: flex;
   width: 1000px;
-  margin: auto;
+  margin: 100px auto;
 }
 
 #right {
@@ -54,7 +59,7 @@
 
 #start {
   font-family: "Noto Sans", sans-serif;
-  background-color: #f0e4d4;
+  background-color: #fff;
   border: none;
   padding: 5px 15px;
   position: absolute;
@@ -67,8 +72,10 @@
   line-height: 3rem;
   letter-spacing: 0.2rem;
   margin: 0 auto;
-  border-radius: 10px;
+  border-radius: 15px;
   font-weight: 900;
+  border: 2px solid #333;
+  cursor: pointer;
 }
 #start:active {
   border: 2px solid #000;
